@@ -2,71 +2,97 @@
 {% load static %}
 {% block content %}
 
-<div class="stitch-canvas">
-    <div class="row align-items-stretch">
-        <!-- Left Side: Massive Heading & Description -->
-        <div class="col-lg-6 d-flex flex-column justify-content-between pe-lg-5">
-            <div>
-                <p class="small text-muted font-monospace mb-4">[ PROCESS ]</p>
-                <h1 class="stitch-hero-title">
-                    Here at<br>
-                    every step
-                </h1>
-            </div>
-            
-            <div class="mt-4 mt-lg-0">
-                <p style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--cobalt-primary); font-weight: 600; line-height: 1.6; max-width: 420px;">
-                    Navigating digital media manipulation can seem like an insurmountable task. Our neural networks protect digital integrity for researchers, platforms, and creators.
-                </p>
-                <div class="stitch-hero-sub">
-                    TrueVision Portal<br>
-                    Version [001.0]
-                </div>
-            </div>
+<!-- Hero Section -->
+<div class="nt-animate">
+    <div class="nt-badge">
+        <span>Deepfake Detection Active</span>
+    </div>
+    <h1 class="nt-h1">
+        Detect deepfakes<br>
+        with <span class="nt-gradient">neural precision</span>
+    </h1>
+    <p class="nt-subtitle" style="margin-bottom: 2.5rem;">
+        NeuralTrace uses a hybrid ResNeXt50 + LSTM architecture to analyze facial regions across video frames and images, detecting manipulation artifacts with 87% validated accuracy.
+    </p>
+</div>
+
+<!-- Stats Row -->
+<div class="nt-stats nt-animate nt-delay-1">
+    <div class="nt-stat">
+        <div class="nt-stat-val">87%</div>
+        <div class="nt-stat-label">Accuracy</div>
+    </div>
+    <div class="nt-stat">
+        <div class="nt-stat-val">ResNeXt50</div>
+        <div class="nt-stat-label">Spatial CNN</div>
+    </div>
+    <div class="nt-stat">
+        <div class="nt-stat-val">LSTM</div>
+        <div class="nt-stat-label">Temporal RNN</div>
+    </div>
+    <div class="nt-stat">
+        <div class="nt-stat-val">2048</div>
+        <div class="nt-stat-label">Feature Dims</div>
+    </div>
+</div>
+
+<div class="nt-divider"></div>
+
+<!-- Feature Cards -->
+<div class="nt-features nt-animate nt-delay-2">
+    <!-- Video Analysis -->
+    <div class="nt-feature" onclick="window.location.href='{% url 'ml_app:home' %}'">
+        <div class="nt-feature-icon">
+            <i class="fas fa-video"></i>
         </div>
+        <div class="nt-feature-title">Video Analysis</div>
+        <div class="nt-feature-desc">
+            Upload a video and the system extracts N frames, crops facial regions using dlib, and runs them through the ResNeXt50 spatial encoder. The LSTM then analyzes temporal inconsistencies across the frame sequence.
+        </div>
+        <div class="nt-feature-tag">→ Start video scan</div>
+    </div>
 
-        <!-- Right Side: Floating Tilted Action Cards (From Reference Image) -->
-        <div class="col-lg-6 mt-5 mt-lg-0 d-flex flex-column justify-content-center">
-            <div class="stitch-cards-stack">
-                <!-- Card 01: Video Analysis -->
-                <div class="stitch-floating-card" onclick="window.location.href='{% url 'ml_app:home' %}'">
-                    <div class="stitch-card-header">
-                        <span class="stitch-card-title">Video Analysis</span>
-                        <span class="stitch-card-number">01</span>
-                    </div>
-                    <div class="stitch-card-body mb-3">
-                        A team of deep learning code savants analyzing the spatial and temporal nuances of temporal facial movements.
-                    </div>
-                    <a href="{% url 'ml_app:home' %}" class="stitch-btn stitch-btn-outline" style="font-size: 0.8rem; padding: 0.6rem 1.2rem;">
-                        <i class="fas fa-video"></i> Start Video Detect
-                    </a>
-                </div>
+    <!-- Image Analysis -->
+    <div class="nt-feature" onclick="window.location.href='{% url 'ml_app:image_upload' %}'">
+        <div class="nt-feature-icon" style="background: rgba(0, 255, 178, 0.1); color: var(--accent-green); border-color: rgba(0, 255, 178, 0.12);">
+            <i class="fas fa-image"></i>
+        </div>
+        <div class="nt-feature-title">Image Analysis</div>
+        <div class="nt-feature-desc">
+            Upload a single image for spatial deepfake detection. The system crops the face, replicates it across a 20-frame sequence for the LSTM, and classifies the facial region for manipulation artifacts.
+        </div>
+        <div class="nt-feature-tag" style="color: var(--accent-green);">→ Start image scan</div>
+    </div>
 
-                <!-- Card 02: Image Analysis -->
-                <div class="stitch-floating-card" onclick="window.location.href='{% url 'ml_app:image_upload' %}'">
-                    <div class="stitch-card-header">
-                        <span class="stitch-card-title">Image Analysis</span>
-                        <span class="stitch-card-number">02</span>
-                    </div>
-                    <div class="stitch-card-body mb-3">
-                        Our tech portal alerts clients of all deepfake manipulations, with spatial classification for single static images.
-                    </div>
-                    <a href="{% url 'ml_app:image_upload' %}" class="stitch-btn stitch-btn-outline" style="font-size: 0.8rem; padding: 0.6rem 1.2rem;">
-                        <i class="fas fa-image"></i> Start Image Detect
-                    </a>
-                </div>
+    <!-- Architecture -->
+    <div class="nt-feature">
+        <div class="nt-feature-icon" style="background: rgba(255, 184, 0, 0.1); color: var(--accent-amber); border-color: rgba(255, 184, 0, 0.12);">
+            <i class="fas fa-brain"></i>
+        </div>
+        <div class="nt-feature-title">Neural Architecture</div>
+        <div class="nt-feature-desc">
+            <strong>ResNeXt50</strong> extracts 2048-dim spatial feature maps per face crop. <strong>LSTM</strong> with 2048 hidden units processes the temporal sequence. Final linear layer maps to binary classification with softmax confidence.
+        </div>
+        <div class="nt-feature-tag" style="color: var(--accent-amber);">ResNeXt50 + LSTM → Softmax</div>
+    </div>
+</div>
 
-                <!-- Card 03: Neural Architecture -->
-                <div class="stitch-floating-card">
-                    <div class="stitch-card-header">
-                        <span class="stitch-card-title">CNN-LSTM Engine</span>
-                        <span class="stitch-card-number">03</span>
-                    </div>
-                    <div class="stitch-card-body">
-                        The ability to maneuver through frame agency strata and keep prediction accuracy above eighty-seven percent.
-                    </div>
-                </div>
-            </div>
+<!-- Pipeline Visualization -->
+<div class="nt-animate nt-delay-3" style="margin-top: 2rem;">
+    <div class="nt-card">
+        <p class="nt-mono" style="margin-bottom: 1rem;">Detection Pipeline</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+            <span class="nt-badge" style="margin: 0;">Upload</span>
+            <span style="color: var(--text-tertiary);">→</span>
+            <span class="nt-badge" style="margin: 0; background: rgba(0,255,178,0.1); color: var(--accent-green); border-color: rgba(0,255,178,0.15);">Frame Extract</span>
+            <span style="color: var(--text-tertiary);">→</span>
+            <span class="nt-badge" style="margin: 0; background: rgba(255,184,0,0.1); color: var(--accent-amber); border-color: rgba(255,184,0,0.15);">Face Crop</span>
+            <span style="color: var(--text-tertiary);">→</span>
+            <span class="nt-badge" style="margin: 0;">ResNeXt50</span>
+            <span style="color: var(--text-tertiary);">→</span>
+            <span class="nt-badge" style="margin: 0; background: rgba(0,255,178,0.1); color: var(--accent-green); border-color: rgba(0,255,178,0.15);">LSTM</span>
+            <span style="color: var(--text-tertiary);">→</span>
+            <span class="nt-badge" style="margin: 0; background: rgba(255,59,92,0.1); color: var(--accent-red); border-color: rgba(255,59,92,0.15);">REAL / FAKE</span>
         </div>
     </div>
 </div>

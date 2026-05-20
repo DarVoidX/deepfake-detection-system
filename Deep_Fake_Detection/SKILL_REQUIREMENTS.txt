@@ -1,5 +1,5 @@
 ==========================================================================
-🛡️ TRUEVISION: DEEP FAKE DETECTION SYSTEM (DFD_SYS)
+🛡️ NEURALTRACE: DEEP FAKE DETECTION SYSTEM (DFD_SYS)
 🎓 COMPREHENSIVE SKILL REQUIREMENTS & STEP-BY-STEP ARCHITECTURE GUIDE
 ==========================================================================
 

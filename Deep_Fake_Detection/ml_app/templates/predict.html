@@ -3,121 +3,95 @@
 {% block content %}
 
 {% if no_faces %}
-<div class="stitch-canvas text-center py-5">
-    <div style="font-size: 4rem; color: var(--alert-fake); margin-bottom: 2rem;">
-        <i class="fas fa-exclamation-circle animate__animated animate__bounceIn"></i>
+<div class="text-center nt-animate" style="padding: 4rem 0;">
+    <div style="font-size: 3rem; color: var(--accent-red); margin-bottom: 1.5rem;">
+        <i class="fas fa-exclamation-circle"></i>
     </div>
-    <h1 class="stitch-hero-title" style="font-size: 3rem; margin-bottom: 1.5rem;">No Faces Detected</h1>
-    <p style="font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); max-width: 500px; margin: 0 auto 3rem auto; line-height: 1.6;">
-        Our facial extraction systems could not detect any aligned human facial boundaries in the provided sequence.
-    </p>
-    <div class="row justify-content-center gap-3">
-        <div class="col-md-4">
-            <a href="{% url 'ml_app:home' %}" class="stitch-btn">
-                <i class="fas fa-video"></i> Try Another Video
-            </a>
-        </div>
-    </div>
+    <h1 class="nt-h2" style="margin-bottom: 1rem;">No Faces Detected</h1>
+    <p class="nt-subtitle" style="margin: 0 auto 2rem;">The facial detection module could not locate any aligned face regions in the uploaded video.</p>
+    <a href="{% url 'ml_app:home' %}" class="nt-btn nt-btn-primary" style="width: auto; display: inline-flex;">
+        <i class="fas fa-redo"></i> Try Another Video
+    </a>
 </div>
 {% else %}
-<div class="stitch-canvas">
-    <p class="small text-muted font-monospace mb-4">[ NEURAL DIAGNOSIS OUTCOME ]</p>
-    
-    <div class="row align-items-start">
-        <!-- Left Column: Video Player & Bounding Box Overlay & Final Label -->
-        <div class="col-lg-6 pe-lg-5">
-            <h1 class="stitch-hero-title" style="font-size: 3.5rem; margin-bottom: 1.5rem;">
-                Neural<br>
-                Outcome
-            </h1>
-            
-            <p class="small text-muted font-monospace mb-2">[ SPATIAL-TEMPORAL VIDEO FEED ]</p>
-            <div id="video-container" style="position: relative; width: 100%; border: 1px solid var(--border-dark); border-radius: 24px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; box-shadow: 0 15px 35px rgba(17, 41, 184, 0.15);">
-                <video width="100%" height="auto" id="predict-media" controls style="border-radius: 24px; display: block;">
-                    <source src="{{ MEDIA_URL }}{{ original_video }}" type="video/mp4" codecs="avc1.4d002a" />
-                </video>
-            </div>
-            
-            <!-- Result Tag Capsule -->
-            <div class="stitch-showcase mt-4">
-                <p class="small text-muted font-monospace mb-1">[ CONVERGED PROBABILITY ]</p>
-                {% if output == "REAL" %}
-                <div class="stitch-result-tag real">
-                    <i class="fas fa-check-circle me-2"></i> {{ output }}
-                </div>
-                <p class="font-monospace text-uppercase" style="color: var(--cobalt-primary); font-size: 0.8rem; letter-spacing: 0.05em;">
-                    THE CLASSIFIER CONFIRMS AUTHENTIC ACQUISITION METRICS.
-                </p>
-                {% else %}
-                <div class="stitch-result-tag fake">
-                    <i class="fas fa-exclamation-triangle me-2"></i> {{ output }}
-                </div>
-                <p class="font-monospace text-uppercase" style="color: var(--alert-fake); font-size: 0.8rem; letter-spacing: 0.05em;">
-                    THE CLASSIFIER DETECTED INCONGRUENT BOUNDARY SYNTHESIS.
-                </p>
-                {% endif %}
 
-                <div class="stitch-meter">
-                    <div class="stitch-meter-fill {% if output == 'FAKE' %}fake{% else %}real{% endif %}" id="confidence-bar"></div>
-                </div>
-                <span class="small font-monospace text-muted">CONFIDENCE LEVEL: {{ confidence }}%</span>
+<div class="nt-animate">
+    <div class="nt-badge">Detection Complete</div>
+</div>
+
+<div class="row g-4">
+    <!-- Left: Video + Result -->
+    <div class="col-lg-6 nt-animate nt-delay-1">
+        <h1 class="nt-h2">Analysis<br><span class="nt-gradient">Result</span></h1>
+
+        <!-- Video Player -->
+        <div class="nt-preview" id="video-container" style="position: relative; margin-bottom: 1.5rem;">
+            <video width="100%" height="auto" id="predict-media" controls style="display: block;">
+                <source src="{{ MEDIA_URL }}{{ original_video }}" type="video/mp4" />
+            </video>
+        </div>
+
+        <!-- Result Showcase -->
+        <div class="nt-card" style="text-align: center;">
+            {% if output == "REAL" %}
+            <div class="nt-result-tag real"><i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i>{{ output }}</div>
+            <p class="nt-mono" style="margin-top: 0.5rem; color: var(--accent-green);">Authentic — no manipulation detected</p>
+            {% else %}
+            <div class="nt-result-tag fake"><i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>{{ output }}</div>
+            <p class="nt-mono" style="margin-top: 0.5rem; color: var(--accent-red);">Manipulation artifacts detected</p>
+            {% endif %}
+            <div class="nt-meter">
+                <div class="nt-meter-fill {% if output == 'FAKE' %}fake{% else %}real{% endif %}" id="confidence-bar"></div>
+            </div>
+            <span class="nt-mono">Confidence: {{ confidence }}%</span>
+        </div>
+    </div>
+
+    <!-- Right: Metrics + Frames -->
+    <div class="col-lg-6 nt-animate nt-delay-2">
+        <!-- Stats -->
+        <div class="nt-stats">
+            <div class="nt-stat">
+                <div class="nt-stat-val" style="color: var(--accent-green);">OK</div>
+                <div class="nt-stat-label">Status</div>
+            </div>
+            <div class="nt-stat">
+                <div class="nt-stat-val">{{ confidence }}%</div>
+                <div class="nt-stat-label">Confidence</div>
+            </div>
+            <div class="nt-stat">
+                <div class="nt-stat-val">{{ faces_cropped_images|length }}</div>
+                <div class="nt-stat-label">Face Crops</div>
+            </div>
+            <div class="nt-stat">
+                <div class="nt-stat-val">{{ preprocessed_images|length }}</div>
+                <div class="nt-stat-label">Frames</div>
             </div>
         </div>
 
-        <!-- Right Column: Meta Metrics & Horizontally Scrolling Frame Splits -->
-        <div class="col-lg-6 mt-5 mt-lg-0">
-            <!-- Diagnosis Metrics Cards Grid -->
-            <div class="stitch-meta-grid">
-                <div class="stitch-meta-cell">
-                    <div class="stitch-meta-label">DIAGNOSIS STATUS</div>
-                    <div class="stitch-meta-val" style="color: var(--cobalt-bright);">SUCCESS</div>
-                </div>
-                <div class="stitch-meta-cell">
-                    <div class="stitch-meta-label">CONFIDENCE</div>
-                    <div class="stitch-meta-val">{{ confidence }}%</div>
-                </div>
-                <div class="stitch-meta-cell">
-                    <div class="stitch-meta-label">CROPPED FACES</div>
-                    <div class="stitch-meta-val">{{ faces_cropped_images|length }}</div>
-                </div>
-                <div class="stitch-meta-cell">
-                    <div class="stitch-meta-label">FRAMES EVALUATED</div>
-                    <div class="stitch-meta-val">{{ preprocessed_images|length }}</div>
-                </div>
-            </div>
+        <!-- Frame Timeline -->
+        <p class="nt-mono" style="margin: 1.5rem 0 0.5rem;">Extracted Frames</p>
+        <div class="nt-gallery">
+            {% for img in preprocessed_images %}
+            <img src="{% static img %}" alt="Frame" height="120">
+            {% endfor %}
+        </div>
 
-            <!-- Frames Split Scrollport -->
-            <div class="mb-4">
-                <p class="small text-muted font-monospace mb-2">[ SEQUENCE TIMELINE SPLITS ]</p>
-                <div class="stitch-scrollport">
-                    {% for each_image in preprocessed_images %}
-                    <img src="{% static each_image %}" alt="Timeline frame" height="150" width="auto" style="margin-right: 0.5rem;" />
-                    {% endfor %}
-                </div>
-            </div>
+        <!-- Face Crops -->
+        <p class="nt-mono" style="margin: 1.5rem 0 0.5rem;">Face Isolations</p>
+        <div class="nt-gallery">
+            {% for img in faces_cropped_images %}
+            <img src="{% static img %}" alt="Face" height="90">
+            {% endfor %}
+        </div>
 
-            <!-- Face Cropped Splits Scrollport -->
-            <div class="mb-4">
-                <p class="small text-muted font-monospace mb-2">[ FACIAL ISOLATION CROPS ]</p>
-                <div class="stitch-scrollport" style="background: rgba(17, 41, 184, 0.03);">
-                    {% for each_image in faces_cropped_images %}
-                    <img src="{% static each_image %}" alt="Face crop" height="100" width="auto" style="margin-right: 0.5rem;" />
-                    {% endfor %}
-                </div>
+        <!-- Actions -->
+        <div class="row g-2 mt-3">
+            <div class="col-6">
+                <a href="{% url 'ml_app:home' %}" class="nt-btn nt-btn-primary"><i class="fas fa-video"></i> New Video</a>
             </div>
-
-            <!-- Action buttons -->
-            <div class="row g-3 mt-4">
-                <div class="col-6">
-                    <a href="{% url 'ml_app:home' %}" class="stitch-btn">
-                        <i class="fas fa-arrow-left"></i> Analyze Video
-                    </a>
-                </div>
-                <div class="col-6">
-                    <a href="{% url 'ml_app:image_upload' %}" class="stitch-btn stitch-btn-outline">
-                        <i class="fas fa-image"></i> Analyze Image
-                    </a>
-                </div>
+            <div class="col-6">
+                <a href="{% url 'ml_app:image_upload' %}" class="nt-btn nt-btn-ghost"><i class="fas fa-image"></i> Try Image</a>
             </div>
         </div>
     </div>
@@ -129,107 +103,47 @@
 {% block js_cripts %}
 <script src="{% static 'js/face-api.min.js' %}"></script>
 <script>
-    $(document).ready(function () {
-        // Animate confidence bar
-        setTimeout(() => {
-            $('#confidence-bar').css('width', '{{ confidence }}%');
-        }, 500);
+$(document).ready(function() {
+    setTimeout(function() { $('#confidence-bar').css('width', '{{ confidence }}%'); }, 400);
 
-        const video = document.getElementById("predict-media");
-        const videoContainer = document.getElementById("video-container");
-        let canvas = null;
-        let detectionTimeout = null;
-        let modelsLoaded = false;
+    var video = document.getElementById("predict-media");
+    var container = document.getElementById("video-container");
+    var canvas, interval, loaded = false;
 
-        // Load models with error handling
-        Promise.all([
-            faceapi.nets.ssdMobilenetv1.loadFromUri('/static/json'),
-            faceapi.nets.tinyFaceDetector.loadFromUri("/static/json")
-        ]).then(() => {
-            modelsLoaded = true;
-            console.log("Face detection models loaded successfully");
-        }).catch(error => {
-            console.error("Error loading face detection models:", error);
-        });
+    Promise.all([
+        faceapi.nets.ssdMobilenetv1.loadFromUri('/static/json'),
+        faceapi.nets.tinyFaceDetector.loadFromUri("/static/json")
+    ]).then(function() { loaded = true; });
 
-        video.addEventListener("loadedmetadata", () => {
-            if (!canvas) {
-                canvas = faceapi.createCanvasFromMedia(video);
-                canvas.style.position = 'absolute';
-                canvas.style.top = '0px';
-                canvas.style.left = '0px';
-                canvas.style.pointerEvents = 'none';
-                videoContainer.appendChild(canvas);
-
-                const displaySize = { width: video.offsetWidth, height: video.offsetHeight };
-                faceapi.matchDimensions(canvas, displaySize);
-            }
-        });
-
-        video.addEventListener("playing", () => {
-            if (!modelsLoaded || !canvas) return;
-
-            const displaySize = { width: video.offsetWidth, height: video.offsetHeight };
-            faceapi.matchDimensions(canvas, displaySize);
-
-            detectionTimeout = setInterval(async () => {
-                try {
-                    const detections = await faceapi.detectAllFaces(video,
-                        new faceapi.TinyFaceDetectorOptions({
-                            inputSize: 416,
-                            scoreThreshold: 0.5
-                        })
-                    );
-
-                    const resizedDetections = faceapi.resizeResults(detections, displaySize);
-                    const context = canvas.getContext("2d");
-                    context.clearRect(0, 0, canvas.width, canvas.height);
-
-                    resizedDetections.forEach((detection) => {
-                        const result = '{{ output }}';
-                        const confidence = '{{ confidence }}';
-                        const box = detection.box;
-
-                        const drawOptions = {
-                            label: result + "  " + confidence + "%",
-                            lineWidth: 3
-                        };
-
-                        if (result === 'REAL') {
-                            drawOptions.boxColor = "#00d4aa";
-                        } else {
-                            drawOptions.boxColor = "#ff3b30";
-                        }
-
-                        const drawBox = new faceapi.draw.DrawBox(box, drawOptions);
-                        drawBox.draw(canvas);
-                    });
-
-                } catch (error) {
-                    console.error("Error during face detection:", error);
-                }
-            }, 100);
-        });
-
-        video.addEventListener("pause", () => {
-            if (detectionTimeout) {
-                clearInterval(detectionTimeout);
-                detectionTimeout = null;
-            }
-        });
-
-        video.addEventListener("ended", () => {
-            if (detectionTimeout) {
-                clearInterval(detectionTimeout);
-                detectionTimeout = null;
-            }
-        });
-
-        window.addEventListener("beforeunload", () => {
-            if (detectionTimeout) {
-                clearInterval(detectionTimeout);
-            }
-        });
+    video.addEventListener("loadedmetadata", function() {
+        if (!canvas) {
+            canvas = faceapi.createCanvasFromMedia(video);
+            canvas.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;';
+            container.appendChild(canvas);
+            faceapi.matchDimensions(canvas, { width: video.offsetWidth, height: video.offsetHeight });
+        }
     });
+
+    video.addEventListener("playing", function() {
+        if (!loaded || !canvas) return;
+        var size = { width: video.offsetWidth, height: video.offsetHeight };
+        faceapi.matchDimensions(canvas, size);
+        interval = setInterval(async function() {
+            try {
+                var det = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.5 }));
+                var resized = faceapi.resizeResults(det, size);
+                var ctx = canvas.getContext("2d");
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                resized.forEach(function(d) {
+                    var color = '{{ output }}' === 'REAL' ? '#00ffb2' : '#ff3b5c';
+                    new faceapi.draw.DrawBox(d.box, { label: '{{ output }}  {{ confidence }}%', lineWidth: 2, boxColor: color }).draw(canvas);
+                });
+            } catch(e) {}
+        }, 100);
+    });
+
+    video.addEventListener("pause", function() { clearInterval(interval); });
+    video.addEventListener("ended", function() { clearInterval(interval); });
+});
 </script>
 {% endblock %}

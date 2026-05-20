@@ -50,9 +50,17 @@ train_transforms = transforms.Compose([
 ])
 
 class Model(nn.Module):
-    def __init__(self, num_classes, latent_dim=2048, lstm_layers=1, hidden_dim=2048, bidirectional=False):
+    def __init__(self, num_classes, latent_dim=2048, lstm_layers=1, hidden_dim=2048, bidirectional=False, pretrained=False):
         super(Model, self).__init__()
-        model = models.resnext50_32x4d(pretrained=True)
+        if pretrained:
+            model = models.resnext50_32x4d(pretrained=True)
+        else:
+            try:
+                # compatibility for newer torchvision style to avoid deprecation warnings and download checking
+                from torchvision.models import ResNeXt50_32X4D_Weights
+                model = models.resnext50_32x4d(weights=None)
+            except ImportError:
+                model = models.resnext50_32x4d(pretrained=False)
         self.model = nn.Sequential(*list(model.children())[:-2])
         self.lstm = nn.LSTM(latent_dim, hidden_dim, lstm_layers, bidirectional)
         self.relu = nn.LeakyReLU()
@@ -174,7 +182,8 @@ def im_plot(tensor):
     plt.show()
 
 def predict(model, img, path='./', video_file_name=""):
-    fmap, logits = model(img.to(device))
+    model_device = next(model.parameters()).device
+    fmap, logits = model(img.to(model_device))
     img = im_convert(img[:, -1, :, :, :], video_file_name)
     params = list(model.parameters())
     weight_softmax = model.linear1.weight.detach().cpu().numpy()
@@ -189,8 +198,9 @@ def predict_image(model, img, image_file_name=""):
     try:
         print(f"Input tensor shape: {img.shape}")
         
-        # Forward pass through model
-        fmap, logits = model(img.to(device))
+        # Forward pass through model on correct device
+        model_device = next(model.parameters()).device
+        fmap, logits = model(img.to(model_device))
         
         print(f"Raw logits: {logits}")
         print(f"Logits shape: {logits.shape}")
@@ -221,7 +231,8 @@ def predict_image(model, img, image_file_name=""):
         return [0, 50.0]  # Default values
 
 def plot_heat_map(i, model, img, path='./', video_file_name=''):
-    fmap, logits = model(img.to(device))
+    model_device = next(model.parameters()).device
+    fmap, logits = model(img.to(model_device))
     params = list(model.parameters())
     weight_softmax = model.linear1.weight.detach().cpu().numpy()
     logits = sm(logits)
@@ -275,6 +286,56 @@ def get_accurate_model(sequence_length):
         print("No model found for the specified sequence length.")
 
     return final_model
+
+_MODEL_CACHE = {}
+
+def get_cached_model(sequence_length):
+    """
+    Retrieves the deepfake detection model for the given sequence length,
+    caching it in memory to avoid reloading from disk on subsequent runs.
+    """
+    global _MODEL_CACHE
+    
+    # get_accurate_model already returns the full absolute path
+    path_to_model = get_accurate_model(sequence_length)
+    if not path_to_model:
+        print(f"Warning: No model found for sequence length {sequence_length}")
+        return None
+    
+    # If already in cache, return it
+    if path_to_model in _MODEL_CACHE:
+        print(f"[CACHE HIT] Reusing loaded model: {os.path.basename(path_to_model)}")
+        return _MODEL_CACHE[path_to_model]
+        
+    print(f"[CACHE MISS] Loading model weights from disk: {os.path.basename(path_to_model)}")
+    try:
+        # Instantiate model without downloading pretrained ImageNet weights
+        model = Model(2, pretrained=False)
+        
+        # Load weights on active device
+        state_dict = torch.load(path_to_model, map_location=torch.device(device))
+        model.load_state_dict(state_dict)
+        model = model.to(device)
+        model.eval()
+        
+        # Store in cache
+        _MODEL_CACHE[path_to_model] = model
+        print(f"Model successfully loaded and cached on device: {device}")
+        return model
+    except Exception as e:
+        print(f"Error loading model to device '{device}': {e}. Retrying on CPU.")
+        try:
+            model = Model(2, pretrained=False)
+            state_dict = torch.load(path_to_model, map_location=torch.device('cpu'))
+            model.load_state_dict(state_dict)
+            model = model.to('cpu')
+            model.eval()
+            _MODEL_CACHE[path_to_model] = model
+            print("Model successfully loaded and cached on CPU.")
+            return model
+        except Exception as ex:
+            print(f"Critical error loading model: {ex}")
+            return None
 
 # File validation
 ALLOWED_VIDEO_EXTENSIONS = set(['mp4', 'gif', 'webm', 'avi', '3gp', 'wmv', 'flv', 'mkv'])
@@ -357,14 +418,10 @@ def predict_page(request):
 
         video_dataset = validation_dataset(path_to_videos, sequence_length=sequence_length, transform=train_transforms)
 
-        if(device == "cuda"):
-            model = Model(2).cuda()
-        else:
-            model = Model(2).cpu()
-        model_name = os.path.join(settings.PROJECT_DIR, 'models', get_accurate_model(sequence_length))
-        path_to_model = os.path.join(settings.PROJECT_DIR, model_name)
-        model.load_state_dict(torch.load(path_to_model, map_location=torch.device('cpu')))
-        model.eval()
+        # Load model using global cache
+        model = get_cached_model(sequence_length)
+        if model is None:
+            raise RuntimeError(f"Could not load deep learning model for sequence length {sequence_length}")
         start_time = time.time()
         
         print("<=== | Started Videos Splitting | ===>")
@@ -578,22 +635,11 @@ def image_predict_page(request):
             else:
                 print(f"Loading model from: {model_path}")
                 
-                # Initialize model
-                if device == "cuda" and torch.cuda.is_available():
-                    model = Model(2).cuda()
-                    print("Using CUDA")
-                else:
-                    model = Model(2).cpu()
-                    print("Using CPU")
-                
-                # Load model weights
-                try:
-                    model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
-                    model.eval()
-                    print("Model loaded successfully")
-                except Exception as e:
-                    print(f"Error loading model: {e}")
-                    return render(request, image_predict_template_name, {"no_faces": True})
+                # Load model weights using cached mechanism
+                model = get_cached_model(sequence_length)
+                if model is None:
+                    raise RuntimeError(f"Could not load deep learning model for sequence length {sequence_length}")
+                print("Model loaded successfully from cache or disk")
                 
                 # Create dataset for single image with proper sequence length
                 print(f"Creating image dataset with sequence length: {sequence_length}")

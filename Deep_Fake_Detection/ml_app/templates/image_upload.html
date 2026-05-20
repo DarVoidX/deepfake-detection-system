@@ -2,79 +2,54 @@
 {% load static %}
 {% block content %}
 
-<div class="stitch-canvas">
-    <div class="row align-items-stretch">
-        <!-- Left Side: Header & Image Preview -->
-        <div class="col-lg-6 d-flex flex-column justify-content-between pe-lg-5">
-            <div>
-                <p class="small text-muted font-monospace mb-4">[ ANALYSIS PORTAL ]</p>
-                <h1 class="stitch-hero-title" style="font-size: 4rem;">
-                    Image<br>
-                    Upload
-                </h1>
-                
-                <p style="font-family: 'Space Grotesk', sans-serif; font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--cobalt-primary); font-weight: 600; line-height: 1.6; max-width: 420px; margin-top: 2rem;">
-                    Upload a single static image to evaluate facial features. The system crops facial bounds and maps spatial inconsistencies.
-                </p>
-            </div>
-            
-            <!-- Image Preview Showcase -->
-            <div class="mt-5 mt-lg-0">
-                <p class="small text-muted font-monospace mb-2">[ IMAGE PREVIEW ]</p>
-                <div style="border: 1px solid var(--border-dark); border-radius: 20px; overflow: hidden; background: rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; min-height: 240px;">
-                    <img id="image-preview" alt="Selected Preview" style="display: none; max-width: 100%; max-height: 300px; border-radius: 20px;">
-                    <div id="image-placeholder" style="color: rgba(17, 41, 184, 0.4); text-align: center; padding: 2rem;">
-                        <i class="fas fa-image fa-2x mb-3" style="color: var(--cobalt-primary);"></i>
-                        <p class="small font-monospace mb-0">NO IMAGE SELECTED FOR PREVIEW</p>
-                    </div>
-                </div>
+<div class="row g-4">
+    <!-- Left: Info + Preview -->
+    <div class="col-lg-6 nt-animate">
+        <div class="nt-badge" style="background: rgba(0,255,178,0.1); color: var(--accent-green); border-color: rgba(0,255,178,0.15);">
+            <span>Image Upload</span>
+        </div>
+        <h1 class="nt-h2">Upload image for<br><span class="nt-gradient">spatial analysis</span></h1>
+        <p class="nt-subtitle" style="margin-bottom: 2rem;">
+            Single image analysis detects faces, replicates the crop across a 20-frame sequence for the LSTM, and classifies spatial manipulation artifacts.
+        </p>
+
+        <!-- Preview -->
+        <div class="nt-preview nt-animate nt-delay-2">
+            <img id="image-preview" alt="Preview" style="display: none; max-height: 300px;">
+            <div class="nt-preview-empty" id="image-placeholder">
+                <i class="fas fa-image"></i>
+                <p>No image selected</p>
             </div>
         </div>
+    </div>
 
-        <!-- Right Side: Interaction Upload Controls Form -->
-        <div class="col-lg-6 mt-5 mt-lg-0 d-flex flex-column justify-content-center">
-            <form class="upload-form" method="POST" enctype="multipart/form-data" name="image-upload" id="image-upload">
-                {% csrf_token %}
+    <!-- Right: Upload Form -->
+    <div class="col-lg-6 nt-animate nt-delay-1">
+        <form method="POST" enctype="multipart/form-data" id="image-upload">
+            {% csrf_token %}
 
-                <!-- Card 01: Drag & Drop Zone -->
-                <div class="stitch-floating-card mb-4" style="transform: none;">
-                    <div class="stitch-card-header">
-                        <span class="stitch-card-title">Select Image File</span>
-                        <span class="stitch-card-number">01</span>
+            <div class="nt-card" style="margin-bottom: 1rem;">
+                <p class="nt-mono" style="margin-bottom: 1rem;">01 — Select image</p>
+                <label style="position: relative; display: block; cursor: pointer;">
+                    <input type="file" name="upload_image_file" id="id_upload_image_file" accept="image/*"
+                           style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;">
+                    <div class="nt-upload-zone" id="file-zone">
+                        <div class="nt-upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <div class="nt-upload-text" id="file-text">Click to browse or drag & drop</div>
+                        <div class="nt-upload-hint">Supports JPG, PNG, WebP</div>
                     </div>
-                    
-                    <div class="position-relative">
-                        <!-- Django Form file input overlay -->
-                        <div style="position: absolute; width: 100%; height: 100%; opacity: 0; z-index: 10; cursor: pointer;">
-                            {{ form.upload_image_file }}
-                        </div>
-                        
-                        <div class="stitch-file-zone" id="file-zone">
-                            <div class="stitch-file-icon">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                            </div>
-                            <div class="stitch-file-text" id="file-text">
-                                CLICK TO BROWSE <br>
-                                <span style="font-weight: normal; font-size: 0.75rem; color: var(--text-muted);">OR DRAG AND DROP IMAGE HERE</span>
-                            </div>
-                        </div>
-                    </div>
+                </label>
+                {% if form.upload_image_file.errors %}
+                {% for error in form.upload_image_file.errors %}
+                <div class="alert alert-danger mt-3"><i class="fas fa-exclamation-triangle"></i> {{ error }}</div>
+                {% endfor %}
+                {% endif %}
+            </div>
 
-                    {% if form.upload_image_file.errors %}
-                    {% for each_error in form.upload_image_file.errors %}
-                    <div class="alert alert-danger mt-3" style="background: rgba(255, 59, 48, 0.1); border: 1px solid var(--alert-fake); color: var(--alert-fake); font-size: 0.85rem; border-radius: 8px;">
-                        <i class="fas fa-exclamation-triangle"></i> {{ each_error }}
-                    </div>
-                    {% endfor %}
-                    {% endif %}
-                </div>
-
-                <!-- Card 02: Run Neural Evaluation -->
-                <button id="imageUpload" type="submit" name="submit" class="stitch-btn">
-                    <i class="fas fa-microchip"></i> Run Spatial Diagnosis
-                </button>
-            </form>
-        </div>
+            <button id="imageUpload" type="submit" class="nt-btn nt-btn-primary nt-btn-lg">
+                <i class="fas fa-shield-alt"></i> Run Detection
+            </button>
+        </form>
     </div>
 </div>
 
@@ -82,60 +57,24 @@
 
 {% block js_scripts %}
 <script>
-    $(function () {
-        const fileInput = $('input[type="file"]');
-        const fileText = $('#file-text');
-        const imagePreview = $('#image-preview');
-        const imagePlaceholder = $('#image-placeholder');
-        const fileZone = $('#file-zone');
-
-        fileInput.on('change', function (e) {
-            const file = e.target.files[0];
-            if (file) {
-                // Update upload zone text
-                fileText.html(`
-                    <span style="color: var(--cobalt-bright); font-weight: bold;">SELECTED: ${file.name.toUpperCase()}</span><br>
-                    <span style="font-size: 0.75rem; color: var(--text-muted);">SIZE: ${(file.size / 1024 / 1024).toFixed(2)} MB</span>
-                `);
-                fileZone.css('border-color', 'var(--cobalt-bright)');
-
-                // Load preview
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    imagePreview.attr('src', e.target.result);
-                    imagePreview.show();
-                    imagePlaceholder.hide();
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Drag & Drop visual highlights
-        const dropZone = $('.position-relative');
-        dropZone.on('dragenter dragover', function() {
-            fileZone.css({
-                'background': 'rgba(17, 41, 184, 0.05)',
-                'border-color': 'var(--cobalt-bright)'
-            });
-        });
-        dropZone.on('dragleave drop', function() {
-            fileZone.css({
-                'background': 'rgba(255, 255, 255, 0.6)',
-                'border-color': 'var(--border-dark)'
-            });
-        });
-
-        // Form Submit Loading Overlay
-        $('#image-upload').on('submit', function () {
-            const submitBtn = $('#imageUpload');
-            submitBtn.html('<i class="fas fa-circle-notch fa-spin"></i> Processing Neural Layers...');
-            submitBtn.prop('disabled', true);
-            
-            $('.stitch-canvas').css({
-                'opacity': '0.8',
-                'pointer-events': 'none'
-            });
-        });
+$(function() {
+    $('input[type="file"]').on('change', function(e) {
+        var file = e.target.files[0];
+        if (file) {
+            $('#file-text').html('<span style="color:var(--accent-green);font-weight:600;">' + file.name + '</span><br><span style="font-size:0.72rem;color:var(--text-tertiary);">' + (file.size/1024/1024).toFixed(2) + ' MB</span>');
+            $('#file-zone').css('border-color','var(--accent-green)');
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $('#image-preview').attr('src', e.target.result).show();
+                $('#image-placeholder').hide();
+            };
+            reader.readAsDataURL(file);
+        }
     });
+
+    $('#image-upload').on('submit', function() {
+        $('#imageUpload').html('<span class="nt-spinner"></span> Processing...').prop('disabled', true);
+    });
+});
 </script>
 {% endblock %}

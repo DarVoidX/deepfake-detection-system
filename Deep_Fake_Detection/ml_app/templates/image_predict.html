@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+{% if no_faces %}
+<div class="stitch-canvas text-center py-5">
+    <div style="font-size: 4rem; color: var(--alert-fake); margin-bottom: 2rem;">
+        <i class="fas fa-exclamation-circle animate__animated animate__bounceIn"></i>
+    </div>
+    <h1 class="stitch-hero-title" style="font-size: 3rem; margin-bottom: 1.5rem;">No Faces Detected</h1>
+    <p style="font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); max-width: 500px; margin: 0 auto 3rem auto; line-height: 1.6;">
+        Our spatial extraction systems could not detect any aligned human facial boundaries in the provided image.
+    </p>
+    <div class="row justify-content-center gap-3">
+        <div class="col-md-4">
+            <a href="{% url 'ml_app:image_upload' %}" class="stitch-btn">
+                <i class="fas fa-image"></i> Try Another Image
+            </a>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="stitch-canvas">
+    <p class="small text-muted font-monospace mb-4">[ NEURAL DIAGNOSIS OUTCOME ]</p>
+    
+    <div class="row align-items-start">
+        <!-- Left Column: Outcome Showcase & Final Labels -->
+        <div class="col-lg-6 pe-lg-5">
+            <h1 class="stitch-hero-title" style="font-size: 3.5rem; margin-bottom: 1.5rem;">
+                Spatial<br>
+                Outcome
+            </h1>
+            
+            <p style="font-family: 'Space Grotesk', sans-serif; font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--cobalt-primary); font-weight: 600; line-height: 1.6; max-width: 420px; margin-bottom: 2rem;">
+                Single image diagnostic extracts localized spatial coordinates. High-frequency structural patterns are calculated to trace synthesis.
+            </p>
+            
+            <!-- Result Tag Showcase -->
+            <div class="stitch-showcase">
+                <p class="small text-muted font-monospace mb-1">[ CONVERGED PROBABILITY ]</p>
+                {% if output == "REAL" %}
+                <div class="stitch-result-tag real">
+                    <i class="fas fa-check-circle me-2"></i> {{ output }}
+                </div>
+                <p class="font-monospace text-uppercase" style="color: var(--cobalt-primary); font-size: 0.8rem; letter-spacing: 0.05em;">
+                    THE SYSTEM DECLARES THE SPATIAL MATRICES SECURE & UNTAMPED.
+                </p>
+                {% else %}
+                <div class="stitch-result-tag fake">
+                    <i class="fas fa-exclamation-triangle me-2"></i> {{ output }}
+                </div>
+                <p class="font-monospace text-uppercase" style="color: var(--alert-fake); font-size: 0.8rem; letter-spacing: 0.05em;">
+                    THE SYSTEM DETECTED SYNTHETIC MANIPULATION ARTIFACTS.
+                </p>
+                {% endif %}
+
+                <div class="stitch-meter">
+                    <div class="stitch-meter-fill {% if output == 'FAKE' %}fake{% else %}real{% endif %}" id="confidence-bar"></div>
+                </div>
+                <span class="small font-monospace text-muted">CONFIDENCE LEVEL: {{ confidence }}%</span>
+            </div>
+        </div>
+
+        <!-- Right Column: Meta Metrics & Isolated Face Crops -->
+        <div class="col-lg-6 mt-5 mt-lg-0">
+            <!-- Diagnosis Metrics Cards Grid -->
+            <div class="stitch-meta-grid">
+                <div class="stitch-meta-cell">
+                    <div class="stitch-meta-label">DIAGNOSIS STATUS</div>
+                    <div class="stitch-meta-val" style="color: var(--cobalt-bright);">SUCCESS</div>
+                </div>
+                <div class="stitch-meta-cell">
+                    <div class="stitch-meta-label">CONFIDENCE</div>
+                    <div class="stitch-meta-val">{{ confidence }}%</div>
+                </div>
+                <div class="stitch-meta-cell">
+                    <div class="stitch-meta-label">FACES EXTRACTED</div>
+                    <div class="stitch-meta-val">{{ faces_cropped_images|length }}</div>
+                </div>
+                <div class="stitch-meta-cell">
+                    <div class="stitch-meta-label">PROCESSING SPEED</div>
+                    <div class="stitch-meta-val">&lt; 1 SEC</div>
+                </div>
+            </div>
+
+            <!-- Face Cropped Splits Scrollport -->
+            {% if faces_cropped_images %}
+            <div class="mb-4">
+                <p class="small text-muted font-monospace mb-2">[ FACIAL ISOLATION CROPS ]</p>
+                <div class="stitch-scrollport" style="background: rgba(17, 41, 184, 0.03);">
+                    {% for each_image in faces_cropped_images %}
+                    <div style="text-align: center; margin-right: 1rem;">
+                        <img src="{% static each_image %}" alt="Face crop" height="120" width="auto" style="border-radius: 12px; border: 1px solid var(--border-dark);" />
+                        <div class="small font-monospace mt-2" style="color: var(--text-muted); font-size: 0.75rem;">FACE {{ forloop.counter }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Action buttons -->
+            <div class="row g-3 mt-4">
+                <div class="col-6">
+                    <a href="{% url 'ml_app:image_upload' %}" class="stitch-btn">
+                        <i class="fas fa-arrow-left"></i> Analyze Image
+                    </a>
+                </div>
+                <div class="col-6">
+                    <a href="{% url 'ml_app:home' %}" class="stitch-btn stitch-btn-outline">
+                        <i class="fas fa-video"></i> Analyze Video
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block js_scripts %}
+<script>
+    $(document).ready(function () {
+        // Animate confidence bar
+        setTimeout(() => {
+            $('#confidence-bar').css('width', '{{ confidence }}%');
+        }, 500);
+    });
+</script>
+{% endblock %}

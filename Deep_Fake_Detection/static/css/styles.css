@@ -1,0 +1,485 @@
+/* 
+   ==========================================================================
+   🛡️ STITCH DESIGN SYSTEM (AWARD-WINNING PREMIUM UI)
+   Inspired by Royal Blue Modern Minimalist & Structured Geometric Layouts
+   ==========================================================================
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+:root {
+    --cobalt-primary: #1129b8;
+    --cobalt-bright: #2443f5;
+    --cobalt-dark: #071363;
+    --bg-blue: #09139e;
+    --sand-light: #f2f2eb;
+    --border-dark: #1129b8;
+    --white: #ffffff;
+    --text-dark: #1129b8;
+    --text-muted: rgba(17, 41, 184, 0.7);
+    --border-light: rgba(17, 41, 184, 0.2);
+    --alert-real: #00d4aa;
+    --alert-fake: #ff3b30;
+}
+
+/* Global Reset & Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    background-color: var(--bg-blue);
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(135deg, #132bc6 0%, #07127a 100%);
+    background-size: 80px 80px, 80px 80px, 100% 100%;
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: var(--white);
+    overflow-x: hidden;
+    position: relative;
+    padding-bottom: 60px;
+}
+
+/* Subtle grid line accents over the page */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 45%;
+    width: 1px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Premium Stitch Canvas Container */
+.stitch-container {
+    max-width: 1280px;
+    margin: 80px auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Off-White Canvas Card (Match reference UI) */
+.stitch-canvas {
+    background-color: var(--sand-light);
+    border-radius: 40px;
+    border: 1px solid var(--border-dark);
+    padding: 4rem;
+    color: var(--text-dark);
+    box-shadow: 0 30px 70px rgba(7, 19, 99, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stitch-canvas::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 40%;
+    width: 1px;
+    height: 100%;
+    background-color: var(--border-light);
+}
+
+/* Massive Typographic Headers */
+.stitch-hero-title {
+    font-size: clamp(3rem, 5.5vw, 5.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    color: var(--cobalt-primary);
+    letter-spacing: -0.03em;
+    margin-bottom: 2rem;
+    text-transform: capitalize;
+}
+
+.stitch-hero-sub {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    font-family: 'Space Grotesk', sans-serif;
+    max-width: 320px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 4rem;
+    position: relative;
+}
+
+/* Floating Elements & Tilted Cards */
+.stitch-cards-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: relative;
+}
+
+.stitch-floating-card {
+    background: var(--white);
+    border: 1px solid var(--border-dark);
+    border-radius: 16px;
+    padding: 1.8rem 2.2rem;
+    color: var(--text-dark);
+    box-shadow: 0 10px 25px rgba(17, 41, 184, 0.08);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+/* Specific rotation styles to mimic standard modern artsy layout */
+.stitch-floating-card:nth-child(1) {
+    transform: rotate(0.5deg) translateY(-5px);
+}
+.stitch-floating-card:nth-child(2) {
+    transform: rotate(-1.2deg) translateX(10px);
+}
+.stitch-floating-card:nth-child(3) {
+    transform: rotate(1deg) translateY(5px);
+}
+
+.stitch-floating-card:hover {
+    transform: scale(1.03) rotate(0deg) translateY(-8px);
+    box-shadow: 0 20px 40px rgba(17, 41, 184, 0.15);
+    border-color: var(--cobalt-bright);
+}
+
+/* Suffix & Title */
+.stitch-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.stitch-card-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--cobalt-primary);
+}
+
+.stitch-card-number {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--cobalt-primary);
+}
+
+.stitch-card-body {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+/* Upload Fields Custom Design */
+.stitch-file-zone {
+    border: 1px dashed var(--border-dark);
+    border-radius: 20px;
+    padding: 3.5rem 2rem;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.stitch-file-zone:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: var(--cobalt-bright);
+    box-shadow: 0 10px 30px rgba(17, 41, 184, 0.05);
+}
+
+.stitch-file-icon {
+    font-size: 2.5rem;
+    color: var(--cobalt-primary);
+    margin-bottom: 1rem;
+}
+
+.stitch-file-text {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+/* Slider Controls */
+.stitch-slider-box {
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.stitch-slider-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stitch-slider-val {
+    background: var(--cobalt-primary);
+    color: var(--white);
+    padding: 0.2rem 0.8rem;
+    border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+}
+
+/* Premium Buttons */
+.stitch-btn {
+    background: var(--cobalt-primary);
+    color: var(--white) !important;
+    border: 1px solid var(--border-dark);
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    width: 100%;
+}
+
+.stitch-btn:hover {
+    background: var(--cobalt-bright);
+    box-shadow: 0 10px 25px rgba(36, 67, 245, 0.3);
+    transform: translateY(-2px);
+}
+
+.stitch-btn-outline {
+    background: transparent;
+    color: var(--cobalt-primary) !important;
+    border: 2px solid var(--border-dark);
+}
+
+.stitch-btn-outline:hover {
+    background: rgba(17, 41, 184, 0.08);
+    transform: translateY(-2px);
+}
+
+/* Custom Navigation Bar styling */
+.stitch-nav {
+    background: rgba(7, 19, 99, 0.8) !important;
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.2rem 0;
+}
+
+.stitch-nav .navbar-brand {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    color: var(--white) !important;
+    font-size: 1.4rem;
+}
+
+.stitch-nav .nav-link {
+    font-family: 'Space Grotesk', sans-serif;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8) !important;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem !important;
+    transition: all 0.3s ease;
+}
+
+.stitch-nav .nav-link:hover, 
+.stitch-nav .nav-link.active {
+    color: var(--white) !important;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Horizontal split view scrollports for outputs */
+.stitch-scrollport {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--border-dark);
+    border-radius: 20px;
+    margin: 1.5rem 0;
+}
+
+.stitch-scrollport img {
+    border-radius: 12px;
+    border: 1px solid var(--border-dark);
+    transition: all 0.3s ease;
+}
+
+.stitch-scrollport img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(17, 41, 184, 0.1);
+}
+
+/* Results Showcase */
+.stitch-showcase {
+    background: var(--white);
+    border: 1px solid var(--border-dark);
+    border-radius: 24px;
+    padding: 2.5rem;
+    margin-top: 2rem;
+    text-align: center;
+    position: relative;
+}
+
+.stitch-result-tag {
+    font-family: 'Outfit', sans-serif;
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    margin: 1.5rem 0;
+}
+
+.stitch-result-tag.real {
+    color: var(--alert-real);
+    text-shadow: 0 0 30px rgba(0, 212, 170, 0.2);
+}
+
+.stitch-result-tag.fake {
+    color: var(--alert-fake);
+    text-shadow: 0 0 30px rgba(255, 59, 48, 0.2);
+}
+
+.stitch-meter {
+    height: 12px;
+    background: rgba(17, 41, 184, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 1.5rem 0;
+}
+
+.stitch-meter-fill {
+    height: 100%;
+    background: var(--cobalt-primary);
+    border-radius: 10px;
+    width: 0%;
+    transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stitch-meter-fill.fake {
+    background: var(--alert-fake);
+}
+
+.stitch-meter-fill.real {
+    background: var(--cobalt-bright);
+}
+
+.stitch-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.2rem;
+    margin: 2rem 0;
+}
+
+.stitch-meta-cell {
+    border: 1px solid var(--border-light);
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    padding: 1.2rem;
+    text-align: center;
+}
+
+.stitch-meta-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.3rem;
+}
+
+.stitch-meta-val {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--cobalt-primary);
+}
+
+/* Footer layout mimicking the clean blue slab footer from reference */
+.stitch-footer {
+    background-color: var(--cobalt-dark);
+    border-top: 1px solid var(--border-dark);
+    padding: 3rem 0;
+    margin-top: 100px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.stitch-footer-brand {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+}
+
+.stitch-footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.stitch-footer-link {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7) !important;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.3s ease;
+}
+
+.stitch-footer-link:hover {
+    color: var(--white) !important;
+}
+
+/* Custom face box style overlay over video player */
+.face-box-overlay {
+    border: 3px solid #ff3b30;
+    position: absolute;
+    box-shadow: 0 0 15px rgba(255, 59, 48, 0.5);
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 991px) {
+    .stitch-canvas {
+        padding: 2.5rem 1.5rem;
+    }
+    .stitch-canvas::before {
+        display: none;
+    }
+    .stitch-hero-sub {
+        margin-top: 2rem;
+    }
+}

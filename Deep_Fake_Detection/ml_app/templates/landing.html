@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="stitch-canvas">
+    <div class="row align-items-stretch">
+        <!-- Left Side: Massive Heading & Description -->
+        <div class="col-lg-6 d-flex flex-column justify-content-between pe-lg-5">
+            <div>
+                <p class="small text-muted font-monospace mb-4">[ PROCESS ]</p>
+                <h1 class="stitch-hero-title">
+                    Here at<br>
+                    every step
+                </h1>
+            </div>
+            
+            <div class="mt-4 mt-lg-0">
+                <p style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--cobalt-primary); font-weight: 600; line-height: 1.6; max-width: 420px;">
+                    Navigating digital media manipulation can seem like an insurmountable task. Our neural networks protect digital integrity for researchers, platforms, and creators.
+                </p>
+                <div class="stitch-hero-sub">
+                    TrueVision Portal<br>
+                    Version [001.0]
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Floating Tilted Action Cards (From Reference Image) -->
+        <div class="col-lg-6 mt-5 mt-lg-0 d-flex flex-column justify-content-center">
+            <div class="stitch-cards-stack">
+                <!-- Card 01: Video Analysis -->
+                <div class="stitch-floating-card" onclick="window.location.href='{% url 'ml_app:home' %}'">
+                    <div class="stitch-card-header">
+                        <span class="stitch-card-title">Video Analysis</span>
+                        <span class="stitch-card-number">01</span>
+                    </div>
+                    <div class="stitch-card-body mb-3">
+                        A team of deep learning code savants analyzing the spatial and temporal nuances of temporal facial movements.
+                    </div>
+                    <a href="{% url 'ml_app:home' %}" class="stitch-btn stitch-btn-outline" style="font-size: 0.8rem; padding: 0.6rem 1.2rem;">
+                        <i class="fas fa-video"></i> Start Video Detect
+                    </a>
+                </div>
+
+                <!-- Card 02: Image Analysis -->
+                <div class="stitch-floating-card" onclick="window.location.href='{% url 'ml_app:image_upload' %}'">
+                    <div class="stitch-card-header">
+                        <span class="stitch-card-title">Image Analysis</span>
+                        <span class="stitch-card-number">02</span>
+                    </div>
+                    <div class="stitch-card-body mb-3">
+                        Our tech portal alerts clients of all deepfake manipulations, with spatial classification for single static images.
+                    </div>
+                    <a href="{% url 'ml_app:image_upload' %}" class="stitch-btn stitch-btn-outline" style="font-size: 0.8rem; padding: 0.6rem 1.2rem;">
+                        <i class="fas fa-image"></i> Start Image Detect
+                    </a>
+                </div>
+
+                <!-- Card 03: Neural Architecture -->
+                <div class="stitch-floating-card">
+                    <div class="stitch-card-header">
+                        <span class="stitch-card-title">CNN-LSTM Engine</span>
+                        <span class="stitch-card-number">03</span>
+                    </div>
+                    <div class="stitch-card-body">
+                        The ability to maneuver through frame agency strata and keep prediction accuracy above eighty-seven percent.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

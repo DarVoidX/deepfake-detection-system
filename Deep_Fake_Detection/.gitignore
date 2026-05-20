@@ -1,0 +1,23 @@
+# Environment and IDE settings
+venv
+.vs
+.vscode
+.DS_Store
+
+# PyTorch Trained Models (Exclude heavy weights > 100MB)
+models/*
+!models/Readme.txt
+
+# Dynamic Django Media Directories
+uploaded_images/*
+!uploaded_images/Readme.txt
+uploaded_videos/*
+!uploaded_videos/Readme.txt
+
+# SQLite Database
+db.sqlite3
+db.sqlite3-journal
+
+# Python Bytecode and cache
+__pycache__/
+*.pyc

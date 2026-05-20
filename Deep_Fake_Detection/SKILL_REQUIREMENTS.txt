@@ -1,0 +1,229 @@
+==========================================================================
+🛡️ TRUEVISION: DEEP FAKE DETECTION SYSTEM (DFD_SYS)
+🎓 COMPREHENSIVE SKILL REQUIREMENTS & STEP-BY-STEP ARCHITECTURE GUIDE
+==========================================================================
+
+Developed by: Darshan Naidu
+Contact Email: darshannaidu696@gmail.com
+GitHub Profile: github.com/darshannaidu696
+
+--------------------------------------------------------------------------
+📌 SECTION 1: REQUIRED PROGRAMMING LANGUAGES & CORE CONCEPTS
+--------------------------------------------------------------------------
+
+To build or understand this project, an engineer needs to master three key
+programming languages and their corresponding system paradigms:
+
+1. PYTHON 3.10+ (The Backend Core & Deep Learning Engine)
+   - Object-Oriented Programming (OOP): Inheritance, class structures, 
+     overriding, and initialization (used for PyTorch modules and custom datasets).
+   - Generators & File handling: Manipulating filesystem paths safely using 
+     os.path, opening binary files, writing, and automatically purging media.
+   - Multi-threading & Time Profiling: Measuring neural model computation speeds 
+     and latency tracking using Python's `time` library.
+
+2. JAVASCRIPT (ES6+) & JQUERY (The Client-Side Interaction & UI Logic)
+   - Asynchronous Execution: Handling event listeners on forms to trigger loading 
+     states before model inference returns.
+   - DOM Manipulation: Dynamic HTML element styling, displaying hidden image/video 
+     preview elements, and injecting status templates.
+   - Browser Canvas APIs: Hooking into the video playback elements to draw face 
+     bounding boxes in real-time.
+
+3. HTML5 & CSS3 (The Visual Layout Structure - Stitch UI Design System)
+   - CSS Grid & Flexbox: Building complex structural panels, centering media 
+     preview screens, and aligning cards cleanly.
+   - CSS Variables & Custom Fonts: Managing uniform styling colors (Cobalt Blue, 
+     Sand light-gray) and modern web typography (Outfit, Space Grotesk).
+   - Dynamic Transforms & Hover Transitions: Utilizing tilted transformations 
+     (transform: rotate(-1.2deg)) that animate smoothly on cursor hover.
+
+--------------------------------------------------------------------------
+📌 SECTION 2: DEEP LEARNING & COMPUTER VISION LIBRARIES USED
+--------------------------------------------------------------------------
+
+This system stands on a sophisticated stack of open-source frameworks:
+
+1. DJANGO 5.0.6 (Web Framework)
+   - Why: Handles request routing, CSRF security, model-view-template (MVT) 
+     coupling, form parsing, and serves as the production-ready entry gate.
+
+2. PYTORCH 2.3.1 (Deep Learning Framework)
+   - Why: Acts as the deep neural compute engine. Used to construct the multi-layer 
+     ResNeXt-50 architecture, manage GPU tensor computation, load model weights, 
+     and process inference sequences.
+
+3. TORCHVISION 0.18.1 (Vision Models Wrapper)
+   - Why: Provides the official pre-trained ResNeXt-50 CNN model architecture 
+     (`torchvision.models.resnext50_32x4d`) used as our spatial feature extractor.
+
+4. OPENCV (opencv-python 4.10.0.84) (Computer Vision)
+   - Why: Handles industrial video input stream splitting. Performs frame-by-frame 
+     decoding, image reading, color space adjustments (BGR to RGB), and coordinate drawing.
+
+5. FACE-RECOGNITION & DLIB (19.24.2) (Facial Landmarking)
+   - Why: Instantly detects facial landmarks and isolates facial coordinates in 
+     each frame using HOG (Histogram of Oriented Gradients) linear SVM models.
+
+6. FACE-API.JS (Client-Side Bounding Box Tracker)
+   - Why: Performs in-browser real-time face detection on the results page using a 
+     lightweight SSD Mobilenet V1 model, allowing real-time canvas coordinate drawing 
+     on the client side.
+
+--------------------------------------------------------------------------
+📌 SECTION 3: STEP-BY-STEP FUNCTIONAL WORKFLOW
+--------------------------------------------------------------------------
+
+Here is how a file travels through the system from the browser upload to 
+the final "REAL" or "FAKE" output:
+
+[STEP 3.1] CLIENT-SIDE UPLOAD INITIATION (FRONTEND)
+  1. The user selects a video (e.g., `Virat_fake.mp4`) and specifies a sequence 
+     length (e.g., 20 frames) using our custom Stitch UI slider.
+  2. The input change event triggers a JavaScript reader to construct an inline 
+     blob URL (`URL.createObjectURL`), showing a real-time preview of the video.
+  3. When the user clicks "Run Temporal Diagnosis", JavaScript disables the forms 
+     and initiates a loading sequence.
+
+[STEP 3.2] REQUEST ROUTING & VALIDATION (BACKEND)
+  1. The browser sends a POST request with the binary file block to `/video-detect/`.
+  2. Django routes the request to the `index` view. 
+  3. The `VideoUploadForm` validates the files to ensure they are secure formats 
+     and within the 100MB size limit.
+  4. The view writes the file to the filesystem inside `uploaded_videos/`.
+
+[STEP 3.3] TEMPORAL FRAME EXTRACTION (OPENCV)
+  1. The system opens the video using `cv2.VideoCapture`.
+  2. The system determines the total number of frames in the video file.
+  3. The system selects N frames (specified by the user) distributed evenly across 
+     the video duration (e.g., for a 300-frame video, frames 0, 15, 30, ... 285).
+  4. The selected frames are saved as raw images in `uploaded_images/`.
+
+[STEP 3.4] FACIAL CROPPING & MARGIN ALIGNMENT (DLIB)
+  1. For each of the extracted frames, `face_recognition.face_locations` is called.
+  2. The system detects the bounding box coordinates: (top, right, bottom, left).
+  3. The system crops the facial boundary out of the frame, adding 40px of safety 
+     padding to capture cheek-blending artifacts around the edges.
+  4. The cropped facial images are saved as individual PNGs in `uploaded_images/`.
+
+[STEP 3.5] PYTORCH MODEL LOAD & WEIGHT INITIATION
+  1. The view glob-matches the chosen sequence length and loads the model weights file:
+     `models/model_87_acc_20_frames_final_data.pt` (or the equivalent matching weights file).
+  2. The PyTorch architecture combines the ResNeXt-50 layer map and the recurrent LSTM layer.
+  3. The loaded parameters are assigned and sent to CUDA (GPU) if an Nvidia graphic card is 
+     available, otherwise it defaults to CPU execution.
+
+[STEP 3.6] DATA TENSOR PREPROCESSING
+  1. The facial cropped frames are loaded as sequences of images.
+  2. Each image is resized to `112x112` pixels to match the input specifications of 
+     the CNN spatial network.
+  3. Image channels are normalized using the standard ImageNet values (mean: `[0.485, 0.456, 0.406]`, 
+     standard deviation: `[0.229, 0.224, 0.225]`).
+  4. The image sequences are packaged into a combined PyTorch tensor of dimensions:
+     `[Batch Size, Sequence Length, Channels, Height, Width]` = `[1, 20, 3, 112, 112]`.
+
+[STEP 3.7] NEURAL INFERENCE (SPATIAL & TEMPORAL PASS)
+  1. Spatial Pass (ResNeXt CNN):
+     The tensor is reshaped to `[20, 3, 112, 112]` to run all frames through the ResNeXt CNN layers 
+     simultaneously. The network maps visual textures, eye borders, and lighting parameters, 
+     extracting a high-level 2048-dimensional feature map per face crop.
+  2. Temporal Pass (LSTM):
+     The feature maps are restructured into sequence form `[1, 20, 2048]` and fed to the LSTM. 
+     The LSTM analyzes temporal movement patterns across frames to spot visual jitter or eye-blinking 
+     anomalies over the timeline.
+  3. Linear Mapping & Softmax:
+     The recurrent outcomes pass through a Linear fully-connected layer to map the 2048 hidden states 
+     to 2 class outputs (Class 1: REAL, Class 0: FAKE). Softmax translates these output scores 
+     into clear percentage values.
+
+[STEP 3.8] VISUAL RENDERING (FRONTEND)
+  1. Django returns the output predictions and array maps of preprocessed frames/crops to the results page.
+  2. The browser renders our new Stitch UI layout with the vertical Cobalt Blue grid and Sand light cards.
+  3. The client-side `face-api.js` loads, drawing tracking indicators around the face in real-time as 
+     the video plays.
+
+--------------------------------------------------------------------------
+📌 SECTION 4: LINE-BY-LINE EXPLANATION OF THE CORE CODE (views.py)
+--------------------------------------------------------------------------
+
+Let's dissect the primary code module (`ml_app/views.py`) to see what every 
+line does:
+
+* LINES 1 - 25: IMPORTS
+  - Load Django utilities (`render`, `redirect`), file system globs, time, 
+    and general mathematical operations (NumPy, PyTorch, OpenCV, face-recognition).
+
+* LINES 27 - 50: MODEL CLASS DEFINITION
+  - Defines `class Model(nn.Module):` inherits from PyTorch Module.
+  - `def __init__(self, ...)`: Initializes the network layers. Loads a standard 
+    ResNeXt-50 spatial model, strips away the final linear classification layer, 
+    and sets up `self.lstm` (2048 hidden dimensions) and `self.linear1` (maps output classes).
+  - `def forward(self, x)`: Defines the forward execution path of the tensor. It reshapes the 
+    data, extracts CNN spatial feature maps, performs average pooling, inputs them into the 
+    LSTM, applies dropout to prevent overfitting, and outputs linear predictions.
+
+* LINES 52 - 149: DATASET LOADER CLASSES
+  - `class validation_dataset(Dataset):` Inherits from PyTorch custom datasets. Implements 
+    video data loading, frame preprocessing, and returns tensors.
+  - `class ImageValidationDataset(Dataset):` Custom dataset class tailored for static single-image 
+    diagnostics. Because the recurrent LSTM expects a temporal sequence (e.g. 20 frames), this loader 
+    replicates the single cropped face image 20 times to fill the sequence tensor appropriately.
+
+* LINES 151 - 180: MODEL SELECTION GLOB
+  - `def get_accurate_model(sequence_length)`: Looks inside the `models/` directory for filenames 
+    matching the sequence length parameter, allowing easy switching of weight models.
+
+* LINES 182 - 206: CORE INFERENCE HELPER
+  - `def predict(model, img, ...)`: Sets model to evaluation mode (`model.eval()`). Runs the 
+    inference tensor through the network, retrieves output class indexes, and calculates 
+    the probability percentage (confidence level).
+
+* LINES 208 - 480: VIDEO INFERENCE CONTROLLER
+  - `def index(request)`: Renders the home drag-and-drop form interface.
+  - `def predict_page(request)`: Main controller for video processing:
+    1. Extracts raw video file uploaded by the user.
+    2. Runs `cv2.VideoCapture` to split the file.
+    3. Triggers HOG `face_locations` landmarking to detect facial frames.
+    4. Crops face boxes out of frames and adds safety padding borders.
+    5. Feeds the cropped face sequence into the PyTorch hybrid model.
+    6. Returns the calculated outcome metrics to `predict.html` templates.
+
+* LINES 482 - 665: IMAGE INFERENCE CONTROLLER
+  - `def image_upload(request)`: Renders the static image upload dashboard.
+  - `def image_predict_page(request)`: Main controller for static image processing:
+    1. Reads the uploaded static image file.
+    2. Performs face landmarking coordinate checks.
+    3. Crops the isolated face.
+    4. Generates a replicated temporal tensor sequence (20 identical crops) inside 
+       `ImageValidationDataset` so that it matches the LSTM layer dimensions.
+    5. Feeds the tensor to PyTorch and returns the prediction to `image_predict.html`.
+
+--------------------------------------------------------------------------
+📌 SECTION 5: RECOMMENDED LEARNING PATHWAY
+--------------------------------------------------------------------------
+
+To build a project of this scale from scratch, you should follow this 
+step-by-step educational pathway:
+
+1. MASTER MODERN BACKEND PYTHONDANGO WEB ARCHITECTURE
+   - MVT Patterns: Master model, view, and template relationships.
+   - Form handling: Learn file upload sanitization and file streams.
+
+2. EXPLORE MACHINE LEARNING BASICS & CONVOLUTIONAL NETWORKS (CNNs)
+   - Image Classification: Learn how kernels extract visual textures, edges, and shapes.
+   - Spatial networks: Study popular architectures like ResNet, DenseNet, and ResNeXt.
+
+3. UNDERSTAND SEQUENCE DATA & RECURRENT NETWORKS (RNNs/LSTMs)
+   - Sequence Modeling: Study how recurrence gates retain temporal memory over a series.
+   - Spatial-Temporal Coupling: Learn to couple a CNN (spatial feature extractor) to 
+     an LSTM (temporal memory tracer) for video streams.
+
+4. COMPUTER VISION FUNDAMENTALS (OPENCV & LANDMARKING)
+   - Matrix manipulation: Learn how pixels are represented in color spaces (BGR vs RGB).
+   - Face Tracking: Study how HOG detectors or SSD models isolate facial landmarks.
+
+5. ADVANCED DESIGN SYSTEMS & MODERN FRONTEND LAYOUTS
+   - CSS variables & Custom Fonts: Master layout typography and consistency.
+   - Interactive CSS Layouts: Learn custom animations, transforms, and grid layouts to build 
+     premium, artsy portfolios that present complex data beautifully.
+==========================================================================
